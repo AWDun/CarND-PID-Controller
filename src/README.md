@@ -20,6 +20,6 @@ Afterwards, I implemented the twiddle code from Sebastian's lecture. It was a bi
 * I start with the manually tuned PID values, and set the "dp" "step size to be 1/10th of the gain values 
 * I run the simulator for 8500 steps until the vehicle crosses the bridge and goes through the three sharp turns, all the while accumulating the total cross track error squared. 
 * After 8500 steps, the vehicle resets, and I run the twiddle logic. The idea is that if the parameter changed helped the performance, increase the parameter change, if not, decrease the change to get closer to the optimal value. 
-* After XXX cycles, the "dp" all become smaller, and converges to a sum lower than 0.005, then I stop twiddle. 
+* After 169 cycles, the "dp" all become smaller, and converges to a sum lower than 0.005, then I stop twiddle. 
 
-With Twiddle, I ended up with P: XXX, I: XXX, D: XXX. A video is attached to show the performance.
+With Twiddle, I ended up with P: 0.55, I: 0.0011, D: 10.793. A video is attached to show the performance.

@@ -34,10 +34,10 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-	double kp = 0.5; //twiddle result with the starting point of 0.5;
-	double ki = 0.001; //twiddle result with the starting point of 0.001;
-	double kd = 10.0;  //twiddle result with the starting point of 10.0;
-	bool twiddle = true; //Turn this to true and twiddle sequence starts
+	double kp = 0.55;//0.5; //twiddle result with the starting point of 0.5;
+	double ki = 0.0011;//0.001; //twiddle result with the starting point of 0.001;
+	double kd = 10.793; //10.0;  //twiddle result with the starting point of 10.0;
+	bool twiddle = false; //Turn this to true and twiddle sequence starts
 	//length that each twiddle cycle runs on the simulator. Allows vehicle to get through bridge an into tight turn
 	int max_itr = 8500;
 	//initialize PID controller
