@@ -34,6 +34,14 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
+	double kp = 0.5; //twiddle result with the starting point of 0.5;
+	double ki = 0.001; //twiddle result with the starting point of 0.001;
+	double kd = 10.0;  //twiddle result with the starting point of 10.0;
+	bool twiddle = true; //Turn this to true and twiddle sequence starts
+	//length that each twiddle cycle runs on the simulator. Allows vehicle to get through bridge an into tight turn
+	int max_itr = 8500;
+	//initialize PID controller
+	pid.Init(kp,ki,kd,twiddle,max_itr);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -51,19 +59,47 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
+					
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
+					
+					//update proportional, differential, and integral errors
+					pid.UpdateError(cte);
+					
+					//run PID controller, output steering
+					steer_value = pid.TotalError();
+					
+					//Check if a twiddle cycle has ended, update gains and twiddle parameters
+					bool reset = pid.TwiddleCount();
+					
+					//resets vehicle if twiddle cycle ends
+					if(reset == true){
+						std::string reset_msg = "42[\"reset\",{}]";
+						ws.send(reset_msg.data(), reset_msg.length(), uWS::OpCode::TEXT);
+					}
+					
+					//If twiddle is has converged to a good gain value, end the program
+					if (pid.TwiddleDone()){
+						return 0;
+					}
+					
+					//Simple proportional control for speed, does a good job staying around 16 mph
+					double throttle;
+					double set_speed = 20.0;
+					double kp_s = 0.05;
+					throttle = -kp_s*(speed - set_speed);
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+					std::cout << "angle output: " << angle << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
+          msgJson["throttle"] = throttle;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
